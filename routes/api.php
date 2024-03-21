@@ -6,6 +6,7 @@ use App\Helpers\JWT;
 
 use App\Http\Controllers\Schematic\SchematicCreate;
 use App\Http\Controllers\Schematic\SchematicUpload;
+use App\Http\Controllers\CreateOTP;
 use App\Models\Schematic;
 /*
 |--------------------------------------------------------------------------
@@ -32,6 +33,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/test', function () {
             return response()->json(['message' => 'Hello World!'], 200);
         });
+        Route::get('/otp', CreateOTP::class);
 
         Route::post('/schematic', SchematicCreate::class);
         Route::post('/schematic-upload', SchematicUpload::class);

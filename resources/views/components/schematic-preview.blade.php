@@ -40,11 +40,6 @@ $deleteSchematic = function ($schematicId) {
                     Download <i class="fas fa-download text-green-700"></i>
                 </a>
                 <h1>
-
-                    <button wire:click="deleteSchematic('{{ $schematic->id }}')" class="ml-4 text-red-700 dark:text-white">
-                        Delete <i class="fas fa-trash text-red-700"></i>
-
-                    </button>
                     @auth
                         @if ($schematic->authors->contains(Auth::user()->uuid))
                             <button wire:click="deleteSchematic('{{ $schematic->id }}')"

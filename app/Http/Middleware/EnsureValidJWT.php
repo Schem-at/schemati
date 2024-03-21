@@ -20,19 +20,24 @@ class EnsureValidJWT
     {
         $token = $request->bearerToken();
         if (!$token) {
-            return response()->json([
-                'error' => 'Token not provided.'
-            ], 401);
+            return response()->json(
+                [
+                    'error' => 'Token not provided.',
+                ],
+                401,
+            );
         }
         try {
             $payload = JWT::decode($token, new Key(config('app.jwt_secret'), 'HS256'));
         } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Token is invalid.'
-            ], 401);
+            return response()->json(
+                [
+                    'error' => 'Token is invalid.',
+                ],
+                401,
+            );
         }
-        $iss = $payload->iss;
-        $iat = $payload->iat;
+
         return $next($request);
     }
 }

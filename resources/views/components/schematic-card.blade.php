@@ -2,7 +2,7 @@
     class="transition-transform duration-300 transform hover:scale-[1.02] active:scale-[0.98]">
     <div class="w-full max-w-sm rounded-lg bg-base-100 shadow-lg">
         <div class="relative p-2">
-            @if ($schematic->preview_video)
+            {{--  @if ($schematic->preview_video)
                 <video class="w-full h-48 object-cover rounded-lg bg-base-200 shadow-[inset_0_4px_4px_rgba(1,0,0,0.6)]"
                     src="{{ $schematic->preview_video }}" loop id="preview-video_{{ $schematic->id }}" muted></video>
             @elseif ($schematic->preview_image)
@@ -11,7 +11,7 @@
             @else
                 <div class="w-full h-48 bg-gray-200 rounded-lg shadow-[inset_0_4px_4px_rgba(1,0,0,0.6)] bg-base-200">
                 </div>
-            @endif
+            @endif  --}}
         </div>
 
         <div class="px-5 pb-5">
