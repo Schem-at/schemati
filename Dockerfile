@@ -30,6 +30,8 @@ RUN bun run build
 
 RUN touch storage/logs/laravel.log
 
+RUN php artisan octane:install --server=frankenphp -n
+
 EXPOSE 8000
 
 ENTRYPOINT php artisan octane:start --host 0.0.0.0 --port 8000
