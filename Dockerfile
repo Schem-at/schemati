@@ -13,7 +13,8 @@ RUN install-php-extensions \
     redis \
     memcached \
     intl \
-    exif
+    exif \ 
+    pcntl 
 
 WORKDIR /var/www
 
