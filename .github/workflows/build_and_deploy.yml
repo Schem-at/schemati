@@ -76,11 +76,11 @@ jobs:
 
       - name: Update deployment
         env:
-          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG_DATA  }}
+          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG_DATA }}
         run: |
           mkdir -p ~/.kube
           echo "$KUBE_CONFIG" > ~/.kube/config
 
-          kubectl set image deployment/website website-http=${{ env.IMAGE_NAME }}:${{ github.sha }} --namespace=${{ env.KUBE_NAMESPACE }}
-          kubectl set image deployment/website website-queue=${{ env.IMAGE_NAME }}:${{ github.sha }} --namespace=${{ env.KUBE_NAMESPACE }}
-          kubectl set image cronjob/website-cronjob website-cron=${{ env.IMAGE_NAME }}:${{ github.sha }} --namespace=${{ env.KUBE_NAMESPACE }}
+          kubectl set image deployment/website website-http=${{ env.IMAGE_NAME }}:${{ env.GENERIC_IMAGE_TAG }} --namespace=${{ env.KUBE_NAMESPACE }}
+          kubectl set image deployment/website website-queue=${{ env.IMAGE_NAME }}:${{ env.GENERIC_IMAGE_TAG }} --namespace=${{ env.KUBE_NAMESPACE }}
+          kubectl set image cronjob/website-cronjob website-cron=${{ env.IMAGE_NAME }}:${{ env.GENERIC_IMAGE_TAG }} --namespace=${{ env.KUBE_NAMESPACE }}
