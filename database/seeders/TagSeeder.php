@@ -11,6 +11,9 @@ class TagSeeder extends Seeder
      */
     public function run(): void
     {
+        if (Tag::where('name', 'root')->exists()) {
+            return;
+        }
         $root = Tag::create([
             'name' => 'root',
             'description' => 'Root tag',
