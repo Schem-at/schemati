@@ -21,6 +21,10 @@ return [
 
     'discord_webhook_url' => env('DISCORD_WEBHOOK_URL', ''),
 
+    'ip_whitelist' => [
+        'enabled' => env('IP_WHITELIST_ENABLED', false),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment
