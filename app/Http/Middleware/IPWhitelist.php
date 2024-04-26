@@ -18,10 +18,8 @@ class IPWhitelist
         }
 
         $whitelistedIPRanges = WhiteListedIp::pluck('ip')->toArray();
-        $incomingIP = $request->getClientIps();
-        //dd($incomingIP);
-        //dump all the incoming request headers
-        dd($request->headers->all());
+        $incomingIP = $request->ip();
+
         foreach ($whitelistedIPRanges as $range) {
             if ($this->ipMatchesRange($incomingIP, $range)) {
                 return $next($request);
