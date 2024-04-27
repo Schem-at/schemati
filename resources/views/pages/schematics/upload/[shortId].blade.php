@@ -91,32 +91,49 @@ new class extends Component implements HasForms {
         info($authors);
         info('Creating schematic...');
 
-        $schematic = new Schematic([
-            'id' => $schematicUUID,
-            'name' => $this->data['title'],
-            'description' => $this->data['description'],
-        ]);
-        info('Created schematic with id: ' . $schematicUUID);
-        $schematic->save();
-        foreach ($authors as $author) {
-            $player = Player::firstOrCreate(['id' => $author]);
-            if ($player) {
-                $schematic->authors()->attach($player);
+        try {
+            $schematic = new Schematic([
+                'id' => $schematicUUID,
+                'name' => $this->data['title'],
+                'description' => $this->data['description'],
+            ]);
+            info('Created schematic with id: ' . $schematicUUID);
+            $schematic->save();
+
+            foreach ($authors as $author) {
+                $player = Player::firstOrCreate(['id' => $author]);
+                if ($player) {
+                    $schematic->authors()->attach($player);
+                }
             }
+
+            $schematic = Schematic::find($schematicUUID);
+            $schematic
+                ->addMediaFromBase64($this->schematicBase64)
+                ->usingFileName($schematicUUID . '.schem')
+                ->toMediaCollection('schematic');
+            $schematic
+                ->addMediaFromBase64($this->data['schematicPreview']['webm'])
+                ->usingFileName($schematicUUID . '.webm')
+                ->toMediaCollection('preview_video');
+            $schematic
+                ->addMediaFromBase64($this->data['schematicPreview']['png'])
+                ->usingFileName($schematicUUID . '.png')
+                ->toMediaCollection('preview_image');
+        } catch (\Exception $e) {
+            // If an exception occurs during the upload process, delete any existing files and DB entries
+            $schematic = Schematic::find($schematicUUID);
+            if ($schematic) {
+                $schematic->authors()->detach();
+                $schematic->delete();
+            }
+
+            $schematic->clearMediaCollection('schematic');
+            $schematic->clearMediaCollection('preview_video');
+            $schematic->clearMediaCollection('preview_image');
+
+            throw $e; // Re-throw the exception to handle it appropriately
         }
-        $schematic = Schematic::find($schematicUUID);
-        $schematic
-            ->addMediaFromBase64($this->schematicBase64)
-            ->usingFileName($schematicUUID . '.schem')
-            ->toMediaCollection('schematic');
-        $schematic
-            ->addMediaFromBase64($this->data['schematicPreview']['webm'])
-            ->usingFileName($schematicUUID . '.webm')
-            ->toMediaCollection('preview_video');
-        $schematic
-            ->addMediaFromBase64($this->data['schematicPreview']['png'])
-            ->usingFileName($schematicUUID . '.png')
-            ->toMediaCollection('preview_image');
     }
 };
 ?>
