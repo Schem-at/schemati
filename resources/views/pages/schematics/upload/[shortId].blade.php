@@ -121,7 +121,6 @@ new class extends Component implements HasForms {
                 ->usingFileName($schematicUUID . '.png')
                 ->toMediaCollection('preview_image');
         } catch (\Exception $e) {
-            // If an exception occurs during the upload process, delete any existing files and DB entries
             $schematic = Schematic::find($schematicUUID);
             if ($schematic) {
                 $schematic->authors()->detach();
@@ -131,8 +130,7 @@ new class extends Component implements HasForms {
             $schematic->clearMediaCollection('schematic');
             $schematic->clearMediaCollection('preview_video');
             $schematic->clearMediaCollection('preview_image');
-
-            throw $e; // Re-throw the exception to handle it appropriately
+            throw $e;
         }
     }
 };
