@@ -15,6 +15,7 @@ class SchematicCard extends Component
     public function __construct(public Schematic $schematic)
     {
         //
+        info($this->schematic);
     }
 
     /**

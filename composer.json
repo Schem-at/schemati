@@ -30,7 +30,8 @@
         "socialiteproviders/microsoft-azure": "^5.1",
         "socialiteproviders/minecraft": "^5.0",
         "spatie/laravel-medialibrary": "^11.0.0",
-        "usernotnull/tall-toasts": "dev-main"
+        "usernotnull/tall-toasts": "dev-main",
+        "wire-elements/wire-extender": "^0.0.4"
     },
     "repositories": [
         {
