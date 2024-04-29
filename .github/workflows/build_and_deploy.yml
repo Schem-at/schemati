@@ -1,0 +1,87 @@
+name: Deploy to Kubernetes
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - staging
+      # - main
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    env:
+      KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      KUBE_NAMESPACE: staging
+      IMAGE_NAME: rg.fr-par.scw.cloud/schematio/schematio-website
+      GENERIC_IMAGE_TAG: staging
+
+    steps:
+      - name: Cancel previous runs
+        uses: styfle/cancel-workflow-action@0.4.1
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Production settings
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "KUBE_NAMESPACE=production" >> $GITHUB_ENV
+          echo "GENERIC_IMAGE_TAG=latest" >> $GITHUB_ENV
+
+      - name: Staging settings
+        if: github.ref == 'refs/heads/staging'
+        run: |
+          echo "KUBE_NAMESPACE=staging" >> $GITHUB_ENV
+          echo "GENERIC_IMAGE_TAG=staging" >> $GITHUB_ENV
+
+      - name: Login to Container Registry
+        run: docker login rg.fr-par.scw.cloud/schematio -u nologin -p "$AWS_SECRET_ACCESS_KEY"
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@master
+        with:
+          install: true
+
+      - name: Docker cache layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-single-buildx-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-single-buildx
+
+      - name: Build & push Docker image
+        env:
+          RELEASE_IMAGE: ${{ env.IMAGE_NAME }}:${{ github.sha }}
+          LATEST_RELEASE_IMAGE: ${{ env.IMAGE_NAME }}:${{ env.GENERIC_IMAGE_TAG }}
+        run: |
+          docker buildx create --use
+
+          docker buildx build \
+            --cache-from=type=local,src=/tmp/.buildx-cache \
+            --cache-to=type=local,dest=/tmp/.buildx-cache-new \
+            --tag ${{ env.RELEASE_IMAGE }} \
+            --tag ${{ env.LATEST_RELEASE_IMAGE }} \
+            --push \
+            .
+
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+      - name: Update deployment
+        env:
+          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG_DATA }}
+        run: |
+          mkdir -p ~/.kube
+          echo "$KUBE_CONFIG" > ~/.kube/config
+
+          kubectl set image deployment/website website-http=${{ env.IMAGE_NAME }}:${{ env.GENERIC_IMAGE_TAG }} --namespace=${{ env.KUBE_NAMESPACE }}
+          kubectl set image deployment/website website-migrations=${{ env.IMAGE_NAME }}:${{ env.GENERIC_IMAGE_TAG }} --namespace=${{ env.KUBE_NAMESPACE }}
+          kubectl set image deployment/website website-queue=${{ env.IMAGE_NAME }}:${{ env.GENERIC_IMAGE_TAG }} --namespace=${{ env.KUBE_NAMESPACE }}
+          kubectl set image cronjob/website-cronjob website-cron=${{ env.IMAGE_NAME }}:${{ env.GENERIC_IMAGE_TAG }} --namespace=${{ env.KUBE_NAMESPACE }}

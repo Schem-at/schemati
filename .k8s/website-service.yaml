@@ -1,0 +1,133 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: website
+spec:
+  ports:
+    - port: 80
+      targetPort: 8000
+      protocol: TCP
+      name: http
+  selector:
+    app: website
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: website
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: website
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: website
+    spec:
+      hostname: website
+      initContainers:
+        - image: rg.fr-par.scw.cloud/schematio/schematio-website:latest
+          imagePullPolicy: Always
+          name: website-migrations
+          command:
+            [
+              "sh",
+              "-c",
+              "php artisan migrate --force && php artisan event:cache && php artisan cache:clear",
+            ]
+          envFrom:
+            - secretRef:
+                name: dotenv
+      containers:
+        - image: rg.fr-par.scw.cloud/schematio/schematio-website:latest
+          imagePullPolicy: Always
+          name: website-http
+          envFrom:
+            - secretRef:
+                name: dotenv
+          ports:
+            - containerPort: 8000
+              name: http
+          volumeMounts:
+            - name: logs
+              mountPath: /app/storage/logs
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 500m
+            limits:
+              memory: 1Gi
+              cpu: 2000m
+        - name: website-queue
+          image: rg.fr-par.scw.cloud/schematio/schematio-website:latest
+          imagePullPolicy: Always
+          command: ["php"]
+          args: ["artisan", "queue:work"]
+          envFrom:
+            - secretRef:
+                name: dotenv
+          resources:
+            requests:
+              memory: 128Mi
+              cpu: 250m
+            limits:
+              memory: 256Mi
+              cpu: 500m
+        - name: website-logs
+          image: busybox
+          args:
+            [
+              /bin/sh,
+              -c,
+              "touch /var/log/laravel.log && tail -n+1 -f /var/log/laravel.log",
+            ]
+          volumeMounts:
+            - name: logs
+              mountPath: /var/log
+          resources:
+            requests:
+              memory: 16Mi
+              cpu: 100m
+            limits:
+              memory: 64Mi
+              cpu: 250m
+      volumes:
+        - name: logs
+          emptyDir: {}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: website-cronjob
+spec:
+  schedule: "* * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  startingDeadlineSeconds: 60
+  jobTemplate:
+    spec:
+      parallelism: 1
+      completions: 1
+      template:
+        spec:
+          containers:
+            - name: website-cron
+              image: rg.fr-par.scw.cloud/schematio/schematio-website:latest
+              imagePullPolicy: Always
+              command: ["php"]
+              args: ["artisan", "schedule:run"]
+              envFrom:
+                - secretRef:
+                    name: dotenv
+              resources:
+                requests:
+                  memory: 128Mi
+                  cpu: 250m
+                limits:
+                  memory: 256Mi
+                  cpu: 500m
+          restartPolicy: OnFailure

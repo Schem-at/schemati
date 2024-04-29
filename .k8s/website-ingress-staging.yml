@@ -1,0 +1,36 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: schematio-website
+  namespace: staging
+spec:
+  dnsNames:
+    - staging.schemat.io
+  secretName: website-certificate
+  issuerRef:
+    name: letsencrypt
+    kind: ClusterIssuer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: schematio-website
+  namespace: staging
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  tls:
+    - hosts:
+        - staging.schemat.io
+      secretName: website-certificate
+  rules:
+    - host: staging.schemat.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: website
+                port:
+                  number: 80

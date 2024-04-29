@@ -11,12 +11,15 @@ class TagSeeder extends Seeder
      */
     public function run(): void
     {
+        if (Tag::where('name', 'root')->exists()) {
+            dump('Tags already seeded');
+            return;
+        }
         $root = Tag::create([
             'name' => 'root',
             'description' => 'Root tag',
         ]);
 
-        //load the tags.json file
         $structure = json_decode(file_get_contents(resource_path('tags.json')), true);
 
         $this->createTagTree($root, $structure);

@@ -11,9 +11,9 @@ class JWT
 {
     public static function getTagBody(Player $player, array $tags, Carbon $exp = null)
     {
-        $tagIds = array_map(function ($tag) {
+        $tagIds = $tags->map(function ($tag) {
             return $tag->id;
-        }, $tags);
+        });
         $body = [
             'player' => $player,
             'tags' => $tagIds,

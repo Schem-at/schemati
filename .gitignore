@@ -24,3 +24,8 @@ public/jars
 /caddy
 frankenphp
 frankenphp-worker.php
+
+.env*
+.flaskenv*
+!.env.project
+!.env.vault

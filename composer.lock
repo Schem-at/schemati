@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "715f9b1ee546e9030ea0e8667bdf2732",
+    "content-hash": "e9542e701b919ef692a46f940b5ef162",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -10939,6 +10939,54 @@
                 "source": "https://github.com/webmozarts/assert/tree/1.11.0"
             },
             "time": "2022-06-03T18:03:27+00:00"
+        },
+        {
+            "name": "wire-elements/wire-extender",
+            "version": "v0.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wire-elements/wire-extender.git",
+                "reference": "08d2a37a1903365f98af55b01a5da22dfd7e6c88"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wire-elements/wire-extender/zipball/08d2a37a1903365f98af55b01a5da22dfd7e6c88",
+                "reference": "08d2a37a1903365f98af55b01a5da22dfd7e6c88",
+                "shasum": ""
+            },
+            "require": {
+                "livewire/livewire": "^v3.4.7",
+                "php": "^8.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "WireElements\\WireExtender\\WireExtenderServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "WireElements\\WireExtender\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Philo Hermans",
+                    "email": "me@philo.dev"
+                }
+            ],
+            "description": "Embed your Livewire components anywhere.",
+            "support": {
+                "issues": "https://github.com/wire-elements/wire-extender/issues",
+                "source": "https://github.com/wire-elements/wire-extender/tree/v0.0.4"
+            },
+            "time": "2024-04-21T21:18:08+00:00"
         }
     ],
     "packages-dev": [

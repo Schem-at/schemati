@@ -1,0 +1,30 @@
+name: Test Vault Secret Loading
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - k8s
+
+jobs:
+  test_vault_secret:
+    name: Test Vault Secret
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Load secrets from Vault
+        env:
+          DOTENV_KEY: ${{ secrets.DOTENV_KEY  }}
+          ENVIRONMENT: "staging"
+        run: |
+          npm install -g dotenv-vault
+          dotenv-vault decrypt $DOTENV_KEY > .env
+          cat .env
