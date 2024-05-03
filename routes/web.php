@@ -22,29 +22,21 @@ Route::get('/', function () {
 
 //short link for schematics/upload/{shortId}
 
-Route::get('/auth/azure', function () {
-    $minecraftUser = Socialite::driver('minecraft')->user();
-    $user = User::updateOrCreate([
-        'uuid' => $minecraftUser->uuid,
-    ]);
+//Route::get('/auth/azure', function () {
+//    $minecraftUser = Socialite::driver('minecraft')->user();
+//    $user = User::updateOrCreate([
+//        'uuid' => $minecraftUser->uuid,
+//    ]);
+//
+//    Auth::login($user, true);
+//    return redirect()->route('index');
+//});
 
-    Auth::login($user, true);
-    return redirect()->route('index');
-});
-
-Route::get('/perf-test', function () {
-    return json_encode([
-        'server' => $_SERVER,
-        'time' => time(),
-        'memory' => memory_get_usage(),
-    ]);
-})->name('perf-test');
-
-Route::get('/auth/minecraft', function () {
-    return Socialite::driver('minecraft')
-        ->with(['prompt' => 'select_account'])
-        ->redirect();
-})->name('login-minecraft');
+//Route::get('/auth/minecraft', function () {
+//    return Socialite::driver('minecraft')
+//        ->with(['prompt' => 'select_account'])
+//        ->redirect();
+//})->name('login-minecraft');
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
     Route::get('/dashboard', function () {

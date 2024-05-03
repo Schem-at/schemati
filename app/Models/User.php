@@ -11,6 +11,7 @@ use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
 use App\Utils\MinecraftAPI;
+use Illuminate\Support\Facades\Hash;
 
 class User extends Authenticatable
 {
@@ -22,6 +23,7 @@ class User extends Authenticatable
     public static function booted()
     {
         static::created(function ($user) {
+            $user->password = Hash::make(Str::random(16));
             if (!$user->player) {
                 $player = Player::create([
                     'id' => $user->uuid,

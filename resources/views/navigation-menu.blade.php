@@ -60,8 +60,10 @@
                     </button>
                 </div>
             @else
-                <a href="{{ route('login-minecraft') }}"
+                <a href="{{ route('login') }}"
                     class="text-sm text-gray-700 rounded-lg md:bg-transparent md:text-blue-700 md:p-2 dark:text-white">{{ __('Log in') }}</a>
+                <a href="{{ route('register') }}"
+                    class="text-sm text-gray-700 rounded-lg md:bg-transparent md:text-blue-700 md:p-2 dark:text-white">{{ __('Register') }}</a>
 
             @endauth
             <button data-collapse-toggle="mobile-menu" type="button"

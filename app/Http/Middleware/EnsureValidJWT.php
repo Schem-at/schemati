@@ -9,30 +9,40 @@ use Firebase\JWT\Key;
 
 class EnsureValidJWT
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
-     */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next, ...$permissions)
     {
         $token = $request->bearerToken();
         if (!$token) {
-            return response()->json([
-                'error' => 'Token not provided.'
-            ], 401);
+            return response()->json(
+                [
+                    'error' => 'Token not provided.',
+                ],
+                401,
+            );
         }
+
         try {
             $payload = JWT::decode($token, new Key(config('app.jwt_secret'), 'HS256'));
         } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Token is invalid.'
-            ], 401);
+            return response()->json(
+                [
+                    'error' => 'Token is invalid.',
+                ],
+                401,
+            );
         }
-        $iss = $payload->iss;
-        $iat = $payload->iat;
+
+        foreach ($permissions as $permission) {
+            if (!isset($payload->permissions) || !in_array($permission, $payload->permissions)) {
+                return response()->json(
+                    [
+                        'error' => 'Insufficient permissions.',
+                    ],
+                    403,
+                );
+            }
+        }
+
         return $next($request);
     }
 }

@@ -153,6 +153,7 @@
             input.select();
             document.execCommand("copy");
             document.body.removeChild(input);
+            Toast.success("Copied to clipboard!");
         }
     </script>
     <script>

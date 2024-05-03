@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->uuid('uuid')->unique();
             $table->rememberToken();
-
+            $table->string('password');
             $table->foreignId('current_team_id')->nullable();
             $table->timestamps();
         });

@@ -36,10 +36,11 @@ class JWT
         return self::getToken(self::getTagBody($player, $tags));
     }
 
-    public static function getTestToken($name = 'Nano_')
+    public static function getTestToken()
     {
-        $player = Player::firstOrCreate(['last_seen_name' => $name]);
-        $tag = Tag::getRoot();
-        return self::getTagToken($player, [$tag]);
+        return self::getToken([
+            'type' => 'system',
+            'permissions' => ['canManagePassword'],
+        ]);
     }
 }

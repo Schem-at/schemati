@@ -6,6 +6,7 @@ use App\Helpers\JWT;
 
 use App\Http\Controllers\Schematic\SchematicCreate;
 use App\Http\Controllers\Schematic\SchematicUpload;
+use App\Http\Controllers\PasswordSet;
 use App\Models\Schematic;
 
 use App\Http\Controllers\Auth\MojangAuthIssuer;
@@ -38,6 +39,10 @@ Route::prefix('v1')->group(function () {
 
         Route::post('/schematic', SchematicCreate::class);
         Route::post('/schematic-upload', SchematicUpload::class);
+    });
+
+    Route::middleware('ensure_valid_jwt:canManagePassword')->group(function () {
+        Route::post('/password-set', PasswordSet::class);
     });
     Route::post('/authorize-mojang', MojangAuthIssuer::class);
     Route::get('/download-schematic/{id}', function (Request $request, $id) {
